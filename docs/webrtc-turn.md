@@ -25,10 +25,11 @@ Production always returns `403 TURN_CREDENTIALS_DISABLED` until authenticated id
 
 `server/src/turn/` exposes `TurnCredentialProvider`:
 
+- `twilio-nts` — [Twilio Network Traversal Service Tokens](https://www.twilio.com/docs/stun-turn/api) (preferred when configured)
 - `coturn-hmac` — [coturn REST / time-limited credentials](https://github.com/coturn/coturn/wiki/turnserver)
 - `static` — lab username/password
 
-Add another adapter by implementing the same interface; keep master secrets server-side.
+Twilio requires all three of `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, and `TWILIO_API_SECRET` in `server/.env` (never `NEXT_PUBLIC_*`). Partial Twilio config fails resolution instead of falling back. Default TTL is 3600 seconds (max 86400 per Twilio).
 
 ## Network / firewall notes
 

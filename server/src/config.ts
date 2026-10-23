@@ -21,14 +21,24 @@ export const config = {
   maxSignalPayloadChars: Number(process.env.MAX_SIGNAL_PAYLOAD_CHARS ?? 65_536),
   /**
    * Dev-only TURN credential minting. Always false in production until real auth exists.
-   * Even if TURN_* env vars are set in production, the HTTP endpoint refuses to issue.
+   * Even if TURN_* / Twilio env vars are set in production, the HTTP endpoint refuses to issue.
    */
   allowTurnCredentialsEndpoint:
     process.env.NODE_ENV !== "production" &&
     process.env.ALLOW_TURN_CREDENTIALS === "true" &&
     process.env.ALLOW_GUEST_IDENTITY === "true",
+  /** Separate HTTP limiter for GET /turn-credentials (Socket.IO limiter does not apply). */
+  turnHttpRateLimitWindowMs: Number(process.env.TURN_HTTP_RATE_LIMIT_WINDOW_MS ?? 60_000),
+  turnHttpRateLimitMax: Number(process.env.TURN_HTTP_RATE_LIMIT_MAX ?? 20),
+  turnHttpRateLimitMaxKeys: Number(process.env.TURN_HTTP_RATE_LIMIT_MAX_KEYS ?? 2048),
+  /**
+   * When true, honor leftmost X-Forwarded-For for TURN HTTP rate-limit keys.
+   * Keep false unless the signaling server sits behind a trusted reverse proxy.
+   */
+  trustProxy: process.env.TRUST_PROXY === "true",
 } as const;
 
+/** May throw on partial Twilio configuration during startup. */
 export const turnProvider = resolveTurnProvider(process.env);
 
 export function assertCorsIsExactOrigin(origin: string): void {

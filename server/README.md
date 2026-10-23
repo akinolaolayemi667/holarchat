@@ -44,15 +44,21 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 Optional. Without TURN env vars the lab uses STUN-only and shows a warning.
 
 ```bash
-# server/.env
+# server/.env — Twilio NTS (preferred)
 ALLOW_TURN_CREDENTIALS=true
-TURN_URLS=turn:YOUR_HOST:3478
-TURN_HMAC_SECRET=your-coturn-static-auth-secret
+TWILIO_ACCOUNT_SID=ACxxxxxxxx
+TWILIO_API_KEY=SKxxxxxxxx
+TWILIO_API_SECRET=xxxxxxxx
+TURN_CREDENTIAL_TTL_SECONDS=3600
+
+# Or self-hosted coturn when Twilio is unset:
+# TURN_URLS=turn:YOUR_HOST:3478
+# TURN_HMAC_SECRET=your-coturn-static-auth-secret
 ```
 
 Then open `/webrtc-lab`, connect signaling (fetches credentials), enable **force relay**, and confirm diagnostics path evidence = `relay`.
 
-See `docs/webrtc-turn.md` for firewall notes and provider adapters.
+See `docs/webrtc-turn.md` for firewall notes and provider adapters. Partial Twilio env fails clearly (does not silently fall back).
 
 ## Production deployment (checklist)
 

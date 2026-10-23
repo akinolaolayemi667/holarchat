@@ -9,16 +9,18 @@ export interface IssuedIceServer {
   credential?: string;
 }
 
+export type TurnCredentialMode = "static" | "coturn-hmac" | "twilio-nts";
+
 export interface TurnCredentialIssue {
   iceServers: IssuedIceServer[];
   ttlSeconds: number;
-  mode: "static" | "coturn-hmac";
+  mode: TurnCredentialMode;
   notice: string;
 }
 
 export interface TurnCredentialProvider {
   readonly id: string;
-  /** Returns null when this provider is not configured. */
+  /** True when this provider has enough config to issue credentials. */
   isConfigured(): boolean;
   issue(subject: string): Promise<TurnCredentialIssue>;
 }

@@ -11,7 +11,7 @@ export interface TurnCredentialsResponse {
   iceServers: IceServerConfig[];
   ttlSeconds?: number;
   notice?: string;
-  mode: "static" | "coturn-hmac" | "disabled";
+  mode: "static" | "coturn-hmac" | "twilio-nts" | "disabled";
 }
 
 export interface TurnCredentialsErrorBody {

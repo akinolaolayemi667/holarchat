@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test src/validation.test.ts src/rooms.test.ts src/guest-auth.test.ts src/rate-limit.test.ts src/signaling.integration.test.ts src/turn/coturn-hmac-provider.test.ts",
+    "test": "node --import tsx --test src/validation.test.ts src/rooms.test.ts src/guest-auth.test.ts src/rate-limit.test.ts src/signaling.integration.test.ts src/turn/coturn-hmac-provider.test.ts src/turn/twilio-nts-provider.test.ts src/turn-http.test.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
