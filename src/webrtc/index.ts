@@ -21,7 +21,11 @@ export {
   createPeerConnectionService,
   peerConnectionService,
 } from "@/lib/webrtc/peer-connection-service";
-export { WebRtcNotReadyError, SignalingRequiredError } from "@/lib/webrtc/types";
+export {
+  WebRtcNotReadyError,
+  SignalingRequiredError,
+  ActivePeerConnectionError,
+} from "@/lib/webrtc/types";
 export { SignalingClient } from "@/lib/webrtc/signaling-client";
 export { SIGNAL_EVENTS } from "@/lib/webrtc/signaling-events";
 export {
@@ -32,3 +36,11 @@ export {
 export { FileTransferEngine } from "@/lib/webrtc/file-transfer-engine";
 export type { TransferProgressView } from "@/lib/webrtc/file-transfer-engine";
 export type { FileTransferEngineHandle } from "@/lib/webrtc/types";
+export {
+  resolveClientIceConfig,
+  buildRtcConfiguration,
+  validateIceServers,
+  IceConfigError,
+} from "@/lib/webrtc/ice-config";
+export { fetchTurnCredentials } from "@/lib/webrtc/turn-credentials-client";
+export type { PeerConnectionDiagnostics } from "@/lib/webrtc/ice-diagnostics";

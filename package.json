@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/lib/messages/validation.test.ts src/lib/messages/status.test.ts src/lib/conversations/start-conversation.test.ts src/lib/webrtc/file-protocol.test.ts src/lib/webrtc/file-transfer-engine.test.ts",
+    "test": "node --import tsx --test src/lib/messages/validation.test.ts src/lib/messages/status.test.ts src/lib/conversations/start-conversation.test.ts src/lib/webrtc/file-protocol.test.ts src/lib/webrtc/file-transfer-engine.test.ts src/lib/webrtc/ice-config.test.ts src/lib/webrtc/ice-diagnostics.test.ts",
     "test:signaling": "npm test --prefix server",
     "typecheck": "tsc --noEmit"
   },

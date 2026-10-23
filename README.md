@@ -11,6 +11,7 @@ Commercial SaaS for real-time messaging and peer-to-peer file sharing.
 | 3 Conversation UX + WebRTC prep | Guest search/start DM, receipts simulator, WebRTC interfaces |
 | 4 Signaling + RTCPeerConnection | Separate `server/` Socket.IO service + `/webrtc-lab` |
 | 5 P2P file transfer over DataChannels | Implemented — `/webrtc-lab` + unit tests |
+| 6A TURN + connection diagnostics | Implemented — configurable ICE, relay test mode, diagnostics |
 | Billing (Stripe) | Not started |
 
 **Not production-ready yet.** Security SQL tests need a live Supabase DB. Deploy configuration and dashboard verification are still manual.
@@ -111,9 +112,45 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 **Limits (lab defaults):** 50 MiB max, 16 KiB chunks, bufferedAmount backpressure, transfer timeout.
 
-**Honest constraints:** Offline recipients cannot receive. STUN-only lab may fail on restrictive NATs; TURN may relay *encrypted* WebRTC traffic when direct connectivity fails — that is still not Socket.IO file relay. Cross-browser / production reliability is not claimed without further testing. Guest identity remains **dev-only**.
+### Signaling connectivity vs WebRTC connectivity
 
-See `server/README.md` for TLS/TURN/production notes.
+| Layer | What “connected” means |
+| --- | --- |
+| Signaling (Socket.IO) | Browser can exchange SDP/ICE with the Node server |
+| WebRTC (`isLive`) | `RTCPeerConnection.connectionState === "connected"` between peers |
+| File DataChannel | `RTCDataChannel.readyState === "open"` on `relaychat-file` |
+
+Signaling success does **not** imply peers can send media/data. Firewalls, symmetric NATs, and missing TURN often break ICE even when Socket.IO is fine.
+
+### Local TURN configuration (Phase 6A)
+
+1. Run a TURN server (e.g. [coturn](https://github.com/coturn/coturn)) reachable from both browsers.
+2. In `server/.env` (never commit real secrets):
+
+```bash
+ALLOW_GUEST_IDENTITY=true
+ALLOW_TURN_CREDENTIALS=true
+TURN_URLS=turn:YOUR_HOST:3478,turns:YOUR_HOST:5349
+# Preferred — coturn static-auth-secret / REST API:
+TURN_HMAC_SECRET=long-random-secret-matching-coturn
+# Or lab-only static user (still server-side only):
+# TURN_USERNAME=labuser
+# TURN_CREDENTIAL=labpass
+```
+
+3. Restart signaling. Connect on `/webrtc-lab` — the app calls `GET /turn-credentials` (dev-only). Master secrets never go to the browser.
+4. Without TURN env vars, the lab stays **STUN-only** and shows a clear warning.
+
+**Forced relay test (two browsers):**
+
+1. Configure TURN as above so credentials load (`hasTurn=true`).
+2. On **both** browsers enable “force `iceTransportPolicy=relay`”.
+3. Start call (offer). A successful `isLive` must use TURN.
+4. Click **Refresh ICE stats**. Path evidence should show `relay` before we label the path as TURN-relayed. Never trust the checkbox alone.
+
+`GET /turn-credentials` is **disabled in production** (fail closed) until real authenticated identity exists.
+
+**Honest constraints:** Offline recipients cannot receive. Cross-browser / production reliability is not claimed without further testing. Guest identity remains **dev-only**. See `server/README.md` and `docs/webrtc-turn.md`.
 
 ## Scripts
 
@@ -142,12 +179,14 @@ See `server/README.md` for TLS/TURN/production notes.
 4. Create two test users and a direct conversation (`select public.create_direct_conversation('<other-user-uuid>');` as one user via SQL or a small admin UI later)
 5. Run `npx supabase test db` after CLI/local DB is available
 
-## WebRTC / file transfer
+## WebRTC / file transfer / TURN
 
-- Signaling: `server/` (Socket.IO) — SDP/ICE only
+- Signaling: `server/` (Socket.IO) — SDP/ICE only (+ optional `GET /turn-credentials` in dev)
 - Peer connection: `src/lib/webrtc/peer-connection-service.ts`
-- File protocol + engine: `src/lib/webrtc/file-protocol.ts`, `file-transfer-engine.ts`
-- Manual two-browser test: `/webrtc-lab` (not mocked)
+- ICE helpers: `ice-config.ts`, `ice-diagnostics.ts`, `turn-credentials-client.ts`
+- File protocol + engine: `file-protocol.ts`, `file-transfer-engine.ts`
+- Manual two-browser test: `/webrtc-lab`
+- TURN docs: `docs/webrtc-turn.md`
 - Chat `/demo` still shows demo transfer UI only; live transfer is in the lab until chat wiring
 
 Protocol summary: JSON control messages (`file-offer` … `file-error`) + binary chunk frames (`RCF1` magic). Offeror-only channel creation avoids conflicting DataChannels.

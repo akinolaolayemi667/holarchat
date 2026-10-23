@@ -9,6 +9,7 @@ Separate Node.js + TypeScript + Socket.IO service for WebRTC offer/answer/ICE re
 - Room membership is enforced server-side. Client-supplied user IDs are **not** trusted as identity; the server assigns `guestId` on connect.
 - A successful signaling handshake ≠ a connected WebRTC peer. The browser must reach `RTCPeerConnection.connectionState === "connected"`.
 - **This server never relays file bytes.** Phase 5 file transfer uses an RTCDataChannel between browsers only.
+- **TURN credentials:** `GET /turn-credentials` is development-only (`ALLOW_TURN_CREDENTIALS=true`). Production fails closed. HMAC/shared secrets stay in `server/.env` — never in the browser.
 
 ## Local start
 
@@ -37,6 +38,21 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 5. Click **Connect signaling** on both, then **Join room**
 6. On one side click **Start call (offer)** — watch states move to negotiating → connected when ICE succeeds
 7. When `dataChannel=open`, use section 4 to send a real file (Accept on the other browser, then Save file)
+
+## TURN credentials (Phase 6A)
+
+Optional. Without TURN env vars the lab uses STUN-only and shows a warning.
+
+```bash
+# server/.env
+ALLOW_TURN_CREDENTIALS=true
+TURN_URLS=turn:YOUR_HOST:3478
+TURN_HMAC_SECRET=your-coturn-static-auth-secret
+```
+
+Then open `/webrtc-lab`, connect signaling (fetches credentials), enable **force relay**, and confirm diagnostics path evidence = `relay`.
+
+See `docs/webrtc-turn.md` for firewall notes and provider adapters.
 
 ## Production deployment (checklist)
 

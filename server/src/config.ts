@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { resolveTurnProvider } from "./turn/index.js";
 
 function requiredInProd(name: string, value: string | undefined, fallback: string): string {
   if (value && value.trim()) return value.trim();
@@ -18,7 +19,17 @@ export const config = {
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 10_000),
   rateLimitMaxEvents: Number(process.env.RATE_LIMIT_MAX_EVENTS ?? 40),
   maxSignalPayloadChars: Number(process.env.MAX_SIGNAL_PAYLOAD_CHARS ?? 65_536),
+  /**
+   * Dev-only TURN credential minting. Always false in production until real auth exists.
+   * Even if TURN_* env vars are set in production, the HTTP endpoint refuses to issue.
+   */
+  allowTurnCredentialsEndpoint:
+    process.env.NODE_ENV !== "production" &&
+    process.env.ALLOW_TURN_CREDENTIALS === "true" &&
+    process.env.ALLOW_GUEST_IDENTITY === "true",
 } as const;
+
+export const turnProvider = resolveTurnProvider(process.env);
 
 export function assertCorsIsExactOrigin(origin: string): void {
   if (origin.includes("*")) {

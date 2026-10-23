@@ -145,7 +145,11 @@ describe("signaling integration", () => {
     assert.equal(offer.fromGuestId, welcomeA.guestId);
     assert.equal(offer.sdp, "v=0-offer");
 
-    const leftPromise = waitForEvent<{ guestId: string }>(b, SIGNAL_EVENTS.roomPeerLeft);
+    const leftPromise = waitForEvent<{ guestId: string }>(
+      b,
+      SIGNAL_EVENTS.roomPeerLeft,
+      5_000,
+    );
     a.disconnect();
     const left = await leftPromise;
     assert.equal(left.guestId, welcomeA.guestId);
