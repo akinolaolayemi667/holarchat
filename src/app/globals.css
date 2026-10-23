@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --rc-canvas: #eef2f4;
+  --rc-surface: #ffffff;
+  --rc-surface-2: #f4f7f8;
+  --rc-ink: #14202b;
+  --rc-muted: #5f6f7d;
+  --rc-border: #d7e0e6;
+  --rc-accent: #0d7a63;
+  --rc-accent-soft: rgba(13, 122, 99, 0.12);
+  --rc-online: #1f9d6a;
+  --rc-away: #c48a1a;
+  --rc-offline: #94a3b0;
+  --rc-danger: #c24141;
+  --rc-danger-soft: rgba(194, 65, 65, 0.12);
+  --rc-warning: #9a6b12;
+  --rc-warning-soft: rgba(196, 138, 26, 0.16);
+  --background: var(--rc-canvas);
+  --foreground: var(--rc-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(13, 122, 99, 0.08), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(31, 111, 139, 0.08), transparent 50%),
+    var(--rc-canvas);
+  color: var(--rc-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5d0d8;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }

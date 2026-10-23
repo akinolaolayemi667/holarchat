@@ -1,0 +1,26 @@
+{
+  "name": "relaychat-signaling",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/validation.test.ts src/rooms.test.ts src/guest-auth.test.ts src/rate-limit.test.ts src/signaling.integration.test.ts",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "socket.io": "^4.8.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/node": "^20.19.0",
+    "socket.io-client": "^4.8.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.2"
+  }
+}

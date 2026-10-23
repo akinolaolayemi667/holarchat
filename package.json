@@ -1,17 +1,24 @@
 {
-  "name": "holarchat",
+  "name": "relaychat",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:signaling": "npm run dev --prefix server",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --import tsx --test src/lib/messages/validation.test.ts src/lib/messages/status.test.ts src/lib/conversations/start-conversation.test.ts src/lib/webrtc/file-protocol.test.ts src/lib/webrtc/file-transfer-engine.test.ts",
+    "test:signaling": "npm test --prefix server",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "next": "16.4.2",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
@@ -21,6 +28,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
