@@ -38,6 +38,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# supabase CLI
+supabase/.temp/
+
+# nested accidental clone (do not commit)
+/holarchat/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -1,5 +1,11 @@
-import "dotenv/config";
+import { config as loadDotenv } from "dotenv";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveTurnProvider } from "./turn/index.js";
+
+// Always load server/.env next to this package — not process.cwd() (repo root .env).
+const serverEnvPath = resolve(dirname(fileURLToPath(import.meta.url)), "../.env");
+loadDotenv({ path: serverEnvPath });
 
 function requiredInProd(name: string, value: string | undefined, fallback: string): string {
   if (value && value.trim()) return value.trim();

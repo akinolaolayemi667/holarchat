@@ -20,7 +20,7 @@ function colorFor(id: string): string {
 }
 
 interface AvatarProps {
-  user: Pick<UserProfile, "id" | "displayName">;
+  user: Pick<UserProfile, "id" | "displayName"> & { avatarUrl?: string };
   size?: "sm" | "md" | "lg";
 }
 
@@ -31,6 +31,17 @@ const sizeClass = {
 };
 
 export function Avatar({ user, size = "md" }: AvatarProps) {
+  if (user.avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- Supabase public storage URL; avoid remotePatterns coupling
+      <img
+        src={user.avatarUrl}
+        alt=""
+        className={`inline-block shrink-0 rounded-full object-cover ${sizeClass[size]}`}
+      />
+    );
+  }
+
   return (
     <div
       className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white ${sizeClass[size]}`}

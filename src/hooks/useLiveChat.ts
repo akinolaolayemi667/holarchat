@@ -42,6 +42,7 @@ interface UseLiveChatArgs {
 
 export function useLiveChat({ userId, profile, initialConversations }: UseLiveChatArgs) {
   const [view, setView] = useState<WorkspaceView>("chat");
+  const [liveProfile, setLiveProfile] = useState<Profile>(profile);
   const [searchQuery, setSearchQuery] = useState("");
   const [conversations, setConversations] =
     useState<ConversationListItem[]>(initialConversations);
@@ -244,11 +245,16 @@ export function useLiveChat({ userId, profile, initialConversations }: UseLiveCh
   }
 
   return {
+    liveProfile,
+    setLiveProfile,
     currentUser: {
-      id: profile.id,
-      displayName: profile.display_name,
+      id: liveProfile.id,
+      displayName: liveProfile.display_name,
       email: "",
-      avatarUrl: profile.avatar_url ?? undefined,
+      avatarUrl: liveProfile.avatar_url ?? undefined,
+      phoneNumber: liveProfile.phone_number ?? undefined,
+      bio: liveProfile.bio ?? undefined,
+      statusMessage: liveProfile.status_message ?? undefined,
     },
     view,
     setView,

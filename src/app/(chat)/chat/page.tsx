@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { LiveChatWorkspace } from "@/features/chat/LiveChatWorkspace";
 import { Spinner } from "@/components/ui/Spinner";
@@ -7,6 +8,10 @@ import { tryGetSupabasePublicEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
 async function ChatPageContent() {
+  // Auth JWT validation uses Date.now() internally. With Cache Components,
+  // defer this whole tree to a real request (Suspense fallback stays in the shell).
+  await connection();
+
   if (!tryGetSupabasePublicEnv()) {
     // Let guests explore the app even before Supabase is configured.
     redirect("/demo?guest=1");
@@ -20,14 +25,28 @@ async function ChatPageContent() {
     redirect("/demo?guest=1");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", userId)
     .maybeSingle();
 
+  if (profileError) {
+    redirect(
+      "/login?message=" +
+        encodeURIComponent(
+          "Could not load your profile (database not ready or access denied). Apply the messaging migration, then sign in again.",
+        ),
+    );
+  }
+
   if (!profile) {
-    redirect("/login?message=Profile missing. Sign out and sign up again, or contact support.");
+    redirect(
+      "/login?message=" +
+        encodeURIComponent(
+          "Profile missing. Your auth user has no profiles row (signup trigger not applied, or account created before the migration). Sign out, apply supabase/migrations, then sign up again.",
+        ),
+    );
   }
 
   let initialConversations: Awaited<ReturnType<typeof listConversationsForUser>> = [];

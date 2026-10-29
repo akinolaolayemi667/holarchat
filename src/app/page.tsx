@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { tryGetSupabasePublicEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -10,6 +11,8 @@ export default async function HomePage() {
 
   if (env) {
     try {
+      // getClaims() validates JWT with Date.now(); wait for a real request first.
+      await connection();
       const supabase = await createClient();
       const { data } = await supabase.auth.getClaims();
       if (data?.claims?.sub) {

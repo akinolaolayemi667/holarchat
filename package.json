@@ -8,9 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/lib/messages/validation.test.ts src/lib/messages/status.test.ts src/lib/conversations/start-conversation.test.ts src/lib/webrtc/file-protocol.test.ts src/lib/webrtc/file-transfer-engine.test.ts src/lib/webrtc/ice-config.test.ts src/lib/webrtc/ice-diagnostics.test.ts",
+    "test": "node --import tsx --test src/lib/messages/validation.test.ts src/lib/messages/status.test.ts src/lib/conversations/start-conversation.test.ts src/lib/webrtc/file-protocol.test.ts src/lib/webrtc/file-transfer-engine.test.ts src/lib/webrtc/ice-config.test.ts src/lib/webrtc/ice-diagnostics.test.ts src/lib/webrtc/lab-turn-banner.test.ts src/features/webrtc/file-picker.test.ts src/lib/supabase/env.test.ts src/lib/profiles/validation.test.ts",
     "test:signaling": "npm test --prefix server",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:supabase": "node scripts/supabase-connectivity-check.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

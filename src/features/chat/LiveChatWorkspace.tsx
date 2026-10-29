@@ -98,6 +98,8 @@ export function LiveChatWorkspace({
                 view={chat.view}
                 user={chat.currentUser}
                 onBack={() => chat.setView("chat")}
+                liveProfile={chat.liveProfile}
+                onLiveProfileChange={chat.setLiveProfile}
               />
             )}
           </main>

@@ -7,6 +7,7 @@ import {
   resolveClientIceConfig,
   type ValidatedRtcIceConfig,
 } from "@/lib/webrtc/ice-config";
+import { shouldShowTurnUnavailableBanner } from "@/lib/webrtc/lab-turn-banner";
 import { SignalingClient } from "@/lib/webrtc/signaling-client";
 import { createPeerConnectionService } from "@/lib/webrtc/peer-connection-service";
 import { fetchTurnCredentials } from "@/lib/webrtc/turn-credentials-client";
@@ -40,6 +41,7 @@ export function WebRtcLab() {
     resolveClientIceConfig({ publicStunUrls: PUBLIC_STUN }),
   );
   const [turnNotice, setTurnNotice] = useState<string | null>(null);
+  const [turnFetchFailed, setTurnFetchFailed] = useState(false);
 
   const clientRef = useRef<SignalingClient | null>(null);
   const peerServiceRef = useRef<PeerConnectionService | null>(null);
@@ -82,6 +84,7 @@ export function WebRtcLab() {
     setPeers([]);
     serverIceRef.current = null;
     setTurnNotice(null);
+    setTurnFetchFailed(false);
     setIceConfig(resolveClientIceConfig({ publicStunUrls: PUBLIC_STUN }));
   }
 
@@ -102,16 +105,19 @@ export function WebRtcLab() {
         guestId,
       });
       if (!result) {
+        setTurnFetchFailed(true);
         setTurnNotice("TURN credentials unavailable — using STUN-only.");
         serverIceRef.current = null;
         rebuildIce("all");
         return;
       }
+      setTurnFetchFailed(false);
       serverIceRef.current = result.iceServers;
       setTurnNotice(result.notice ?? `TURN credentials loaded (mode=${result.mode}).`);
       pushLog(`ICE from server (${result.mode}) — credentials not logged`);
       rebuildIce(relayOnly ? "relay" : "all");
     } catch (err) {
+      setTurnFetchFailed(true);
       serverIceRef.current = null;
       const message = err instanceof Error ? err.message : "TURN fetch failed";
       setTurnNotice(`TURN unavailable: ${message}`);
@@ -301,6 +307,11 @@ export function WebRtcLab() {
 
   const diag = snapshot?.diagnostics;
   const turnMissing = !iceConfig.hasTurn;
+  const showTurnUnavailable = shouldShowTurnUnavailableBanner({
+    hasTurn: iceConfig.hasTurn,
+    signalingState: signalingState as "disconnected" | "connecting" | "connected" | "error",
+    turnFetchFailed,
+  });
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-6 px-4 py-10">
@@ -320,14 +331,21 @@ export function WebRtcLab() {
         </p>
       </div>
 
-      {turnMissing ? (
+      {signalingState === "disconnected" && turnMissing && !turnFetchFailed ? (
+        <p className="rounded-xl border border-[var(--rc-border)] bg-[var(--rc-surface-2)] px-3 py-2 text-sm text-[var(--rc-muted)]" role="status">
+          Signaling is disconnected. Click <strong>Connect signaling</strong> — TURN credentials
+          (Twilio NTS) load after the guest welcome handshake.
+        </p>
+      ) : null}
+
+      {showTurnUnavailable ? (
         <p
           className="rounded-xl bg-[var(--rc-warning-soft)] px-3 py-2 text-sm text-[var(--rc-warning)]"
           role="status"
         >
           TURN is unavailable — using STUN-only ICE. Restrictive NATs/firewalls may fail.
-          Configure the signaling server TURN env vars and set{" "}
-          <code>ALLOW_TURN_CREDENTIALS=true</code> for local relay testing. See README.
+          Confirm signaling is connected and that <code>server/.env</code> has Twilio (or coturn)
+          plus <code>ALLOW_TURN_CREDENTIALS=true</code> and <code>ALLOW_GUEST_IDENTITY=true</code>.
         </p>
       ) : null}
 

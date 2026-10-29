@@ -63,11 +63,14 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-Or paste `supabase/migrations/20261022162334_initial_messaging.sql` into the SQL Editor and run it.
+Or paste migrations from `supabase/migrations/` into the SQL Editor and run them in order
+(`20261022162334_initial_messaging.sql`, then `20261029200000_profile_management.sql` for
+phone/bio/status fields, profile insert policy, and the public `avatars` storage bucket).
 
 5. **Auth redirect URLs** (Authentication → URL configuration):
-   - Site URL: `http://localhost:3000`
-   - Redirect URLs: `http://localhost:3000/auth/callback`
+   - Site URL (local): `http://localhost:3000`
+   - Redirect URLs: `http://localhost:3000/auth/callback`, `https://holarchat.vercel.app/auth/callback`
+   - For production, also set Site URL to `https://holarchat.vercel.app` (or keep localhost as Site URL and list both redirects).
 
 6. Optional: disable email confirmation while developing (Authentication → Providers → Email), or keep it on and use the confirmation link.
 

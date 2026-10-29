@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { formatBytes } from "@/lib/format";
 import type { FileTransferEngineHandle } from "@/lib/webrtc/types";
 import type { TransferProgressView } from "@/lib/webrtc/file-transfer-engine";
+import { openFilePicker } from "./file-picker";
 
 interface FileTransferLabPanelProps {
   engine: FileTransferEngineHandle | null;
@@ -40,6 +41,8 @@ export function FileTransferLabPanel({
   const transfers = useTransferList(engine);
   const [dragOver, setDragOver] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const canPick = Boolean(channelOpen && engine);
 
   const maxLabel = useMemo(() => {
     if (!engine) return "";
@@ -101,18 +104,38 @@ export function FileTransferLabPanel({
         <p className="mt-1 text-xs text-[var(--rc-muted)]">
           Sender: {localLabel || "you"} → Receiver: {remoteLabel || "peer"}
         </p>
-        <label className="mt-3 inline-block cursor-pointer rounded-xl bg-[var(--rc-accent)] px-4 py-2 text-sm font-semibold text-white">
+        {/*
+          Use a real button + input.click() — Chrome often ignores clicks on a <label>
+          that wraps an sr-only / disabled file input.
+        */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          tabIndex={-1}
+          aria-hidden="true"
+          disabled={!canPick}
+          onChange={(e) => {
+            if (e.target.files?.length) void sendFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          className={`mt-3 inline-block rounded-xl px-4 py-2 text-sm font-semibold text-white ${
+            canPick
+              ? "cursor-pointer bg-[var(--rc-accent)]"
+              : "cursor-not-allowed bg-[var(--rc-muted)] opacity-60"
+          }`}
+          disabled={!canPick}
+          onClick={() => {
+            if (!openFilePicker(fileInputRef.current)) {
+              setLocalError("File picker unavailable. Wait until the DataChannel is open.");
+            }
+          }}
+        >
           Choose file
-          <input
-            type="file"
-            className="sr-only"
-            disabled={!channelOpen || !engine}
-            onChange={(e) => {
-              if (e.target.files?.length) void sendFiles(e.target.files);
-              e.target.value = "";
-            }}
-          />
-        </label>
+        </button>
       </div>
 
       {localError ? (

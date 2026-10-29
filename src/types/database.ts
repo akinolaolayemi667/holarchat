@@ -21,6 +21,9 @@ export interface Database {
           id: string;
           display_name: string;
           avatar_url: string | null;
+          phone_number: string | null;
+          bio: string | null;
+          status_message: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -28,12 +31,18 @@ export interface Database {
           id: string;
           display_name: string;
           avatar_url?: string | null;
+          phone_number?: string | null;
+          bio?: string | null;
+          status_message?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           display_name?: string;
           avatar_url?: string | null;
+          phone_number?: string | null;
+          bio?: string | null;
+          status_message?: string | null;
           updated_at?: string;
         };
         Relationships: [];
