@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { Spinner } from "@/components/ui/Spinner";
 import { signInAction } from "@/lib/auth/actions";
+import { SITE_NAME } from "@/lib/seo/site";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: `Sign in to ${SITE_NAME} (Hola / RelayChat) to access your conversations and profile.`,
+  alternates: { canonical: "/login" },
+};
 
 async function LoginForm({
   searchParams,

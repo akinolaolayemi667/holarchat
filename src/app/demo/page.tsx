@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ChatWorkspace } from "@/features/chat/ChatWorkspace";
 import { Spinner } from "@/components/ui/Spinner";
+import { SITE_NAME } from "@/lib/seo/site";
 
 export const instant = false;
+
+export const metadata: Metadata = {
+  title: `Guest demo`,
+  description: `Try ${SITE_NAME} (Hola / RelayChat) as a guest — preview real-time chat UI without an account.`,
+  alternates: { canonical: "/demo" },
+};
 
 /**
  * Public guest app preview — no account required.
