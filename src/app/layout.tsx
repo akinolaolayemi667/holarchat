@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "RelayChat",
   description:
     "RelayChat — commercial SaaS for real-time chat and peer-to-peer file sharing (Phase 1 UI prototype).",
+  verification: {
+    google: "NfnZfRlo8_2taoHjVyYNMbA6SAFNTdB0ju_K8tRora4",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
